@@ -73,7 +73,7 @@ export const awaitDataChannel = (
         }));
 
         peerConnection.addEventListener('icecandidate', ({ candidate }) => {
-            if (candidate) {
+            if (candidate !== null) {
                 candidateChannel.send(<any> { candidate });
             }
         });
