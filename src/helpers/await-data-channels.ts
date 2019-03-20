@@ -8,13 +8,13 @@ export const awaitDataChannel = (
     return new Observable((observer) => {
         const peerConnection: RTCPeerConnection = new RTCPeerConnection({ iceServers });
 
-        const candidateChannel = webSocketSubject
+        const candidateChannelSubject = webSocketSubject
             .mask<ICandidateSubjectEvent>({ type: 'candidate' });
 
-        const descriptionChannel = webSocketSubject
+        const descriptionChannelSubject = webSocketSubject
             .mask<IDescriptionSubjectEvent>({ type: 'description' });
 
-        const candidateChannelSubscription = candidateChannel
+        const candidateChannelSubscription = candidateChannelSubject
             .subscribe(({ candidate }) => peerConnection
                 // @todo Remove casting again when possible.
                 .addIceCandidate(new RTCIceCandidate(<any> candidate))
@@ -22,7 +22,7 @@ export const awaitDataChannel = (
                     // Errors can be ignored.
                 }));
 
-        const descriptionChannelSubscription = descriptionChannel
+        const descriptionChannelSubscription = descriptionChannelSubject
             .subscribe(({ description }) => {
                 peerConnection
                     // @todo Remove casting again when possible.
@@ -41,7 +41,7 @@ export const awaitDataChannel = (
                             });
 
                         // @todo Remove casting again when possible.
-                        descriptionChannel.send(<any> { description: answer });
+                        descriptionChannelSubject.send(<any> { description: answer });
                     })
                     .catch(() => {
                         // @todo Handle this error and maybe create another answer.
@@ -74,7 +74,7 @@ export const awaitDataChannel = (
 
         peerConnection.addEventListener('icecandidate', ({ candidate }) => {
             if (candidate !== null) {
-                candidateChannel.send(<any> { candidate });
+                candidateChannelSubject.send(<any> { candidate });
             }
         });
 
