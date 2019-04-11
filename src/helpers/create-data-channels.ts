@@ -1,39 +1,38 @@
 import { Observable } from 'rxjs';
-import { IDataChannel, IMaskableSubject, TStringifyableJsonValue } from 'rxjs-broker';
-import {
-    ICandidateSubjectEvent,
-    IDescriptionSubjectEvent
-} from '../interfaces';
+import { IRemoteSubject, mask } from 'rxjs-broker';
+import { ICandidateEvent, ICandidateMessage, IClientEvent, IDescriptionEvent, IDescriptionMessage } from '../interfaces';
 
 export const createDataChannel = (
-    iceServers: RTCIceServer[], label: null | string, webSocketSubject: IMaskableSubject<TStringifyableJsonValue>
-): Observable<IDataChannel> => {
+    iceServers: RTCIceServer[],
+    label: null | string,
+    webSocketSubject: IRemoteSubject<IClientEvent['message']>
+): Observable<RTCDataChannel> => {
     return new Observable((observer) => {
         const peerConnection: RTCPeerConnection = new RTCPeerConnection({ iceServers });
 
-        // @todo Casting peerConnection to any should not be necessary forever.
-        const dataChannel: IDataChannel = (<any> peerConnection).createDataChannel(label, {
+        const dataChannel: RTCDataChannel = peerConnection.createDataChannel((label === null) ? '' : label, {
             ordered: true
         });
 
-        const candidateSubject = webSocketSubject
-            .mask<ICandidateSubjectEvent>({ type: 'candidate' });
-
-        const descriptionSubject = webSocketSubject
-            .mask<IDescriptionSubjectEvent>({ type: 'description' });
+        const candidateSubject = mask<ICandidateMessage, ICandidateEvent, IClientEvent['message']>(
+            { type: 'candidate' },
+            webSocketSubject
+        );
+        const descriptionSubject = mask<IDescriptionMessage, IDescriptionEvent, IClientEvent['message']>(
+            { type: 'description' },
+            webSocketSubject
+        );
 
         const candidateSubjectSubscription = candidateSubject
             .subscribe(({ candidate }) => peerConnection
-                // @todo Remove casting again when possible.
-                .addIceCandidate(new RTCIceCandidate(<any> candidate))
+                .addIceCandidate(new RTCIceCandidate(candidate))
                 .catch(() => {
                     // Errors can be ignored.
                 }));
 
         const descriptionSubjectSubscription = descriptionSubject
             .subscribe(({ description }) => peerConnection
-                // @todo Remove casting again when possible.
-                .setRemoteDescription(<any> new RTCSessionDescription(<any> description))
+                .setRemoteDescription(new RTCSessionDescription(description))
                 .catch(() => {
                     // @todo Handle this error and maybe request another description.
                 }));
@@ -51,7 +50,8 @@ export const createDataChannel = (
 
         peerConnection.addEventListener('icecandidate', ({ candidate }) => {
             if (candidate !== null) {
-                candidateSubject.send(<any> { candidate });
+                // @todo Remove casting again when possible.
+                candidateSubject.send(<ICandidateMessage> { candidate });
             }
         });
 
@@ -66,7 +66,7 @@ export const createDataChannel = (
                         });
 
                     // @todo Remove casting again when possible.
-                    descriptionSubject.send(<any> { description });
+                    descriptionSubject.send(<IDescriptionMessage> { description });
                 })
                 .catch(() => {
                     // @todo Handle this error and maybe create another offer.

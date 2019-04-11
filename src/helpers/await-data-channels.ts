@@ -1,23 +1,26 @@
 import { Observable, Subscriber } from 'rxjs';
-import { IDataChannel, IMaskableSubject, TStringifyableJsonValue } from 'rxjs-broker';
-import { ICandidateSubjectEvent, IDataChannelEvent, IDescriptionSubjectEvent } from '../interfaces';
+import { IRemoteSubject, mask } from 'rxjs-broker';
+import { ICandidateEvent, ICandidateMessage, IClientEvent, IDataChannelEvent, IDescriptionEvent, IDescriptionMessage } from '../interfaces';
 
 export const awaitDataChannel = (
-    iceServers: RTCIceServer[], webSocketSubject: IMaskableSubject<TStringifyableJsonValue>
-): Observable<IDataChannel> => {
+    iceServers: RTCIceServer[],
+    webSocketSubject: IRemoteSubject<IClientEvent['message']>
+): Observable<RTCDataChannel> => {
     return new Observable((observer) => {
         const peerConnection: RTCPeerConnection = new RTCPeerConnection({ iceServers });
 
-        const candidateChannelSubject = webSocketSubject
-            .mask<ICandidateSubjectEvent>({ type: 'candidate' });
-
-        const descriptionChannelSubject = webSocketSubject
-            .mask<IDescriptionSubjectEvent>({ type: 'description' });
+        const candidateChannelSubject = mask<ICandidateMessage, ICandidateEvent, IClientEvent['message']>(
+            { type: 'candidate' },
+            webSocketSubject
+        );
+        const descriptionChannelSubject = mask<IDescriptionMessage, IDescriptionEvent, IClientEvent['message']>(
+            { type: 'description' },
+            webSocketSubject
+        );
 
         const candidateChannelSubscription = candidateChannelSubject
             .subscribe(({ candidate }) => peerConnection
-                // @todo Remove casting again when possible.
-                .addIceCandidate(new RTCIceCandidate(<any> candidate))
+                .addIceCandidate(new RTCIceCandidate(candidate))
                 .catch(() => {
                     // Errors can be ignored.
                 }));
@@ -25,8 +28,7 @@ export const awaitDataChannel = (
         const descriptionChannelSubscription = descriptionChannelSubject
             .subscribe(({ description }) => {
                 peerConnection
-                    // @todo Remove casting again when possible.
-                    .setRemoteDescription(<any> new RTCSessionDescription(<any> description))
+                    .setRemoteDescription(new RTCSessionDescription(description))
                     .catch(() => {
                         // @todo Handle this error and maybe request another description.
                     });
@@ -41,18 +43,18 @@ export const awaitDataChannel = (
                             });
 
                         // @todo Remove casting again when possible.
-                        descriptionChannelSubject.send(<any> { description: answer });
+                        descriptionChannelSubject.send(<IDescriptionMessage> { description: answer });
                     })
                     .catch(() => {
                         // @todo Handle this error and maybe create another answer.
                     });
             });
 
-        peerConnection.addEventListener('datachannel', <EventListener> (({ channel }: IDataChannelEvent) => {
+        peerConnection.addEventListener('datachannel', ({ channel }: IDataChannelEvent) => {
             candidateChannelSubscription.unsubscribe();
             descriptionChannelSubscription.unsubscribe();
 
-            const emitChannel = (bsrvr: Subscriber<IDataChannel>) => {
+            const emitChannel = (bsrvr: Subscriber<RTCDataChannel>) => {
                 bsrvr.next(channel);
                 bsrvr.complete();
             };
@@ -70,11 +72,12 @@ export const awaitDataChannel = (
             } else {
                 emitChannel(observer);
             }
-        }));
+        });
 
         peerConnection.addEventListener('icecandidate', ({ candidate }) => {
             if (candidate !== null) {
-                candidateChannelSubject.send(<any> { candidate });
+                // @todo Remove casting again when possible.
+                candidateChannelSubject.send(<ICandidateMessage> { candidate });
             }
         });
 

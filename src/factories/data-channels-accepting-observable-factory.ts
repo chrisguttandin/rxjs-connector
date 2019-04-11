@@ -1,15 +1,15 @@
+import { mask } from 'rxjs-broker';
 import { mergeMap } from 'rxjs/operators';
-import { IRequestSubjectMessage } from '../interfaces';
-import { TDataChannelsAcceptingObservableFactoryFactory } from '../types';
+import { IRequestEvent, IRequestMessage } from '../interfaces';
+import { TDataChannelsAcceptingObservableFactoryFactory, TWebSocketEvent } from '../types';
 
 export const createDataChannelsAcceptingObservableFactory: TDataChannelsAcceptingObservableFactoryFactory = (
     createDataChannelAcceptingObservable
 ) => {
-    return (webSocketSubject) => webSocketSubject
-        .mask<IRequestSubjectMessage>({ type: 'request' })
+    return (webSocketSubject) => mask<IRequestMessage, IRequestEvent, TWebSocketEvent>({ type: 'request' }, webSocketSubject)
         .pipe(
-            mergeMap(({ isActive = true, label = null, mask }) => {
-                return createDataChannelAcceptingObservable(isActive, label, webSocketSubject.mask(mask));
+            mergeMap(({ isActive = true, label = null, mask: msk }) => {
+                return createDataChannelAcceptingObservable(isActive, label, mask(msk, webSocketSubject));
             })
         );
 };

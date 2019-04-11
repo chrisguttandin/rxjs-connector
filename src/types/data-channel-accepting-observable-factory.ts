@@ -1,8 +1,9 @@
 import { Observable } from 'rxjs';
-import { IDataChannel, IMaskableSubject, TStringifyableJsonValue } from 'rxjs-broker';
+import { IRemoteSubject } from 'rxjs-broker';
+import { IClientEvent } from '../interfaces';
 
 export type TDataChannelAcceptingObservableFactory = (
     isActive: boolean,
     label: null | string,
-    webSocketSubject: IMaskableSubject<TStringifyableJsonValue>
-) => Observable<IDataChannel>;
+    webSocketSubject: IRemoteSubject<IClientEvent['message']>
+) => Observable<RTCDataChannel>;
