@@ -1,4 +1,4 @@
-import { accept, isSupported, request } from '../../src/module';
+import { accept, isSupported } from '../../src/module';
 
 describe('module', () => {
 
@@ -14,14 +14,6 @@ describe('module', () => {
 
         it('should be a boolean', () => {
             expect(isSupported).to.be.a('boolean');
-        });
-
-    });
-
-    describe('request()', () => {
-
-        it('should be a function', () => {
-            expect(request).to.be.a('function');
         });
 
     });

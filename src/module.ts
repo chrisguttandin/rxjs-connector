@@ -1,6 +1,5 @@
 import { connect, isSupported } from 'rxjs-broker';
 import { createDataChannelAcceptingObservableFactory } from './factories/data-channel-accepting-observable-factory';
-import { createDataChannelRequestingObservableFactory } from './factories/data-channel-requesting-observable-factory';
 import { createDataChannelsAcceptingObservableFactory } from './factories/data-channels-accepting-observable-factory';
 
 export * from './interfaces';
@@ -27,7 +26,3 @@ export const accept = (url: string) => createDataChannelsAcceptingObservable(con
  */
 // @todo Do also check of RTCPeerConnection and DataChannel support.
 export { isSupported };
-
-const createDataChannelRequestingObservable = createDataChannelRequestingObservableFactory(ICE_SERVERS);
-
-export const request = (url: string) => createDataChannelRequestingObservable(connect(url));
