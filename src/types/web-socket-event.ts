@@ -1,3 +1,3 @@
-import { IClientEvent, IRequestMessage } from '../interfaces';
+import { IClientEvent, IRequestEvent } from '../interfaces';
 
-export type TWebSocketEvent = IClientEvent | IRequestMessage;
+export type TWebSocketEvent = IClientEvent | IRequestEvent;
