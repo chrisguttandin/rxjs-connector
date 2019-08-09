@@ -8,11 +8,8 @@ export const createDataChannel = (
     webSocketSubject: IRemoteSubject<IClientEvent['message']>
 ): Observable<RTCDataChannel> => {
     return new Observable((observer) => {
-        const peerConnection: RTCPeerConnection = new RTCPeerConnection({ iceServers });
-
-        const dataChannel: RTCDataChannel = peerConnection.createDataChannel((label === null) ? '' : label, {
-            ordered: true
-        });
+        const peerConnection = new RTCPeerConnection({ iceServers });
+        const dataChannel = peerConnection.createDataChannel((label === null) ? '' : label, { ordered: true });
 
         const candidateSubject = mask<ICandidateMessage, ICandidateEvent, IClientEvent['message']>(
             { type: 'candidate' },
