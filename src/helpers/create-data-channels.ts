@@ -1,21 +1,21 @@
 import { Observable } from 'rxjs';
 import { IRemoteSubject, mask } from 'rxjs-broker';
-import { ICandidateEvent, ICandidateMessage, IClientEvent, IDescriptionEvent, IDescriptionMessage } from '../interfaces';
+import { TCandidateEvent, TCandidateMessage, TClientEvent, TDescriptionEvent, TDescriptionMessage } from '../types';
 
 export const createDataChannel = (
     iceServers: RTCIceServer[],
     label: null | string,
-    webSocketSubject: IRemoteSubject<IClientEvent['message']>
+    webSocketSubject: IRemoteSubject<TClientEvent['message']>
 ): Observable<RTCDataChannel> => {
     return new Observable((observer) => {
         const peerConnection = new RTCPeerConnection({ iceServers });
         const dataChannel = peerConnection.createDataChannel((label === null) ? '' : label, { ordered: true });
 
-        const candidateSubject = mask<ICandidateMessage, ICandidateEvent, IClientEvent['message']>(
+        const candidateSubject = mask<TCandidateMessage, TCandidateEvent, TClientEvent['message']>(
             { type: 'candidate' },
             webSocketSubject
         );
-        const descriptionSubject = mask<IDescriptionMessage, IDescriptionEvent, IClientEvent['message']>(
+        const descriptionSubject = mask<TDescriptionMessage, TDescriptionEvent, TClientEvent['message']>(
             { type: 'description' },
             webSocketSubject
         );
@@ -48,7 +48,7 @@ export const createDataChannel = (
         peerConnection.addEventListener('icecandidate', ({ candidate }) => {
             if (candidate !== null) {
                 // @todo Remove casting again when possible.
-                candidateSubject.send(<ICandidateMessage> { candidate });
+                candidateSubject.send(<TCandidateMessage> { candidate });
             }
         });
 
@@ -63,7 +63,7 @@ export const createDataChannel = (
                         });
 
                     // @todo Remove casting again when possible.
-                    descriptionSubject.send(<IDescriptionMessage> { description });
+                    descriptionSubject.send(<TDescriptionMessage> { description });
                 })
                 .catch(() => {
                     // @todo Handle this error and maybe create another offer.

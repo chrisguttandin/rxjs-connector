@@ -1,19 +1,20 @@
 import { Observable, Subscriber } from 'rxjs';
 import { IRemoteSubject, mask } from 'rxjs-broker';
-import { ICandidateEvent, ICandidateMessage, IClientEvent, IDataChannelEvent, IDescriptionEvent, IDescriptionMessage } from '../interfaces';
+import { IDataChannelEvent } from '../interfaces';
+import { TCandidateEvent, TCandidateMessage, TClientEvent, TDescriptionEvent, TDescriptionMessage } from '../types';
 
 export const awaitDataChannel = (
     iceServers: RTCIceServer[],
-    webSocketSubject: IRemoteSubject<IClientEvent['message']>
+    webSocketSubject: IRemoteSubject<TClientEvent['message']>
 ): Observable<RTCDataChannel> => {
     return new Observable((observer) => {
         const peerConnection: RTCPeerConnection = new RTCPeerConnection({ iceServers });
 
-        const candidateChannelSubject = mask<ICandidateMessage, ICandidateEvent, IClientEvent['message']>(
+        const candidateChannelSubject = mask<TCandidateMessage, TCandidateEvent, TClientEvent['message']>(
             { type: 'candidate' },
             webSocketSubject
         );
-        const descriptionChannelSubject = mask<IDescriptionMessage, IDescriptionEvent, IClientEvent['message']>(
+        const descriptionChannelSubject = mask<TDescriptionMessage, TDescriptionEvent, TClientEvent['message']>(
             { type: 'description' },
             webSocketSubject
         );
@@ -43,7 +44,7 @@ export const awaitDataChannel = (
                             });
 
                         // @todo Remove casting again when possible.
-                        descriptionChannelSubject.send(<IDescriptionMessage> { description: answer });
+                        descriptionChannelSubject.send(<TDescriptionMessage> { description: answer });
                     })
                     .catch(() => {
                         // @todo Handle this error and maybe create another answer.
@@ -77,7 +78,7 @@ export const awaitDataChannel = (
         peerConnection.addEventListener('icecandidate', ({ candidate }) => {
             if (candidate !== null) {
                 // @todo Remove casting again when possible.
-                candidateChannelSubject.send(<ICandidateMessage> { candidate });
+                candidateChannelSubject.send(<TCandidateMessage> { candidate });
             }
         });
 

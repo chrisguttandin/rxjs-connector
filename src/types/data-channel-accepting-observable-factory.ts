@@ -1,9 +1,9 @@
 import { Observable } from 'rxjs';
 import { IRemoteSubject } from 'rxjs-broker';
-import { IClientEvent } from '../interfaces';
+import { TClientEvent } from './client-event';
 
 export type TDataChannelAcceptingObservableFactory = (
     isActive: boolean,
     label: null | string,
-    webSocketSubject: IRemoteSubject<IClientEvent['message']>
+    webSocketSubject: IRemoteSubject<TClientEvent['message']>
 ) => Observable<RTCDataChannel>;
