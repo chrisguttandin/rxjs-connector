@@ -2,8 +2,12 @@ import { connect, isSupported } from 'rxjs-broker';
 import { createDataChannelAcceptingObservableFactory } from './factories/data-channel-accepting-observable-factory';
 import { createDataChannelsAcceptingObservableFactory } from './factories/data-channels-accepting-observable-factory';
 
-export * from './interfaces';
-export * from './types';
+/*
+ * @todo Explicitly referencing the barrel file seems to be necessary when enabling the
+ * isolatedModules compiler option.
+ */
+export * from './interfaces/index';
+export * from './types/index';
 
 const ICE_SERVERS = [ {
     urls: [
