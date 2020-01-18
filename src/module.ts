@@ -1,4 +1,4 @@
-import { connect, isSupported } from 'rxjs-broker';
+import { ISubjectConfig, connect, isSupported } from 'rxjs-broker';
 import { createDataChannelAcceptingObservableFactory } from './factories/data-channel-accepting-observable-factory';
 import { createDataChannelsAcceptingObservableFactory } from './factories/data-channels-accepting-observable-factory';
 
@@ -20,7 +20,9 @@ const createDataChannelsAcceptingObservable = createDataChannelsAcceptingObserva
     createDataChannelAcceptingObservableFactory(ICE_SERVERS)
 );
 
-export const accept = (url: string) => createDataChannelsAcceptingObservable(connect(url));
+export const accept = (url: string, subjectConfig: ISubjectConfig = { }) => {
+    return createDataChannelsAcceptingObservable(connect(url, subjectConfig));
+};
 
 /**
  * This property is true if the browser supports WebSockets.
