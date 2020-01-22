@@ -9,8 +9,7 @@ module.exports = (config) => {
         concurrency: 2,
 
         files: [
-            '../../test/integration/**/*.js',
-            '../../test/unit/**/*.js'
+            '../../test/integration/**/*.js'
         ],
 
         frameworks: [
@@ -19,8 +18,7 @@ module.exports = (config) => {
         ],
 
         preprocessors: {
-            '../../test/integration/**/*.js': 'webpack',
-            '../../test/unit/**/*.js': 'webpack'
+            '../../test/integration/**/*.js': 'webpack'
         },
 
         webpack: {
