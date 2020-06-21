@@ -19,37 +19,31 @@ export const awaitDataChannel = (
             webSocketSubject
         );
 
-        const candidateChannelSubscription = candidateChannelSubject
-            .subscribe(({ candidate }) => peerConnection
-                .addIceCandidate(new RTCIceCandidate(candidate))
-                .catch(() => {
-                    // Errors can be ignored.
-                }));
+        const candidateChannelSubscription = candidateChannelSubject.subscribe(({ candidate }) =>
+            peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {
+                // Errors can be ignored.
+            })
+        );
 
-        const descriptionChannelSubscription = descriptionChannelSubject
-            .subscribe(({ description }) => {
-                peerConnection
-                    .setRemoteDescription(new RTCSessionDescription(description))
-                    .catch(() => {
-                        // @todo Handle this error and maybe request another description.
-                    });
-
-                peerConnection
-                    .createAnswer()
-                    .then((answer) => {
-                        peerConnection
-                            .setLocalDescription(answer)
-                            .catch(() => {
-                                // @todo Handle this error and maybe create another description.
-                            });
-
-                        // @todo Remove casting again when possible.
-                        descriptionChannelSubject.send(<TDescriptionMessage> { description: answer });
-                    })
-                    .catch(() => {
-                        // @todo Handle this error and maybe create another answer.
-                    });
+        const descriptionChannelSubscription = descriptionChannelSubject.subscribe(({ description }) => {
+            peerConnection.setRemoteDescription(new RTCSessionDescription(description)).catch(() => {
+                // @todo Handle this error and maybe request another description.
             });
+
+            peerConnection
+                .createAnswer()
+                .then((answer) => {
+                    peerConnection.setLocalDescription(answer).catch(() => {
+                        // @todo Handle this error and maybe create another description.
+                    });
+
+                    // @todo Remove casting again when possible.
+                    descriptionChannelSubject.send(<TDescriptionMessage>{ description: answer });
+                })
+                .catch(() => {
+                    // @todo Handle this error and maybe create another answer.
+                });
+        });
 
         peerConnection.addEventListener('datachannel', ({ channel }: IDataChannelEvent) => {
             candidateChannelSubscription.unsubscribe();
@@ -78,7 +72,7 @@ export const awaitDataChannel = (
         peerConnection.addEventListener('icecandidate', ({ candidate }) => {
             if (candidate !== null) {
                 // @todo Remove casting again when possible.
-                candidateChannelSubject.send(<TCandidateMessage> { candidate });
+                candidateChannelSubject.send(<TCandidateMessage>{ candidate });
             }
         });
 

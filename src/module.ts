@@ -9,18 +9,17 @@ import { createDataChannelsAcceptingObservableFactory } from './factories/data-c
 export * from './interfaces/index';
 export * from './types/index';
 
-const ICE_SERVERS = [ {
-    urls: [
-        'stun:stun.l.google.com:19302',
-        'stun:stun1.l.google.com:19302'
-    ]
-} ];
+const ICE_SERVERS = [
+    {
+        urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302']
+    }
+];
 
 const createDataChannelsAcceptingObservable = createDataChannelsAcceptingObservableFactory(
     createDataChannelAcceptingObservableFactory(ICE_SERVERS)
 );
 
-export const accept = (url: string, subjectConfig: ISubjectConfig = { }) => {
+export const accept = (url: string, subjectConfig: ISubjectConfig = {}) => {
     return createDataChannelsAcceptingObservable(connect(url, subjectConfig));
 };
 

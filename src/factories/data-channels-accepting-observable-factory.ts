@@ -5,8 +5,8 @@ import { TDataChannelsAcceptingObservableFactoryFactory, TRequestEvent, TRequest
 export const createDataChannelsAcceptingObservableFactory: TDataChannelsAcceptingObservableFactoryFactory = (
     createDataChannelAcceptingObservable
 ) => {
-    return (webSocketSubject) => mask<TRequestMessage, TRequestEvent, TWebSocketEvent>({ type: 'request' }, webSocketSubject)
-        .pipe(
+    return (webSocketSubject) =>
+        mask<TRequestMessage, TRequestEvent, TWebSocketEvent>({ type: 'request' }, webSocketSubject).pipe(
             mergeMap(({ isActive = true, label = null, mask: msk }) => {
                 return createDataChannelAcceptingObservable(isActive, label, mask(msk, webSocketSubject));
             })

@@ -5,12 +5,13 @@ import { createDataChannelsAcceptingObservableFactory } from '../../../src/facto
 import { stub } from 'sinon';
 
 describe('createDataChannelsAcceptingObservable()', () => {
-
     let createDataChannelsAcceptingObservable;
     let webSocketSubject;
 
     beforeEach(() => {
-        createDataChannelsAcceptingObservable = createDataChannelsAcceptingObservableFactory(createDataChannelAcceptingObservableFactory([ ]));
+        createDataChannelsAcceptingObservable = createDataChannelsAcceptingObservableFactory(
+            createDataChannelAcceptingObservableFactory([])
+        );
         webSocketSubject = { pipe: stub() };
 
         webSocketSubject.pipe.returns(new Observable());
@@ -19,5 +20,4 @@ describe('createDataChannelsAcceptingObservable()', () => {
     it('should return an AnonymousSubject', () => {
         expect(createDataChannelsAcceptingObservable(webSocketSubject)).to.be.an.instanceOf(AnonymousSubject);
     });
-
 });
