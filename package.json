@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "@babel/runtime": "^7.11.2",
-        "rxjs-broker": "^6.0.20",
+        "rxjs-broker": "^6.0.21",
         "tslib": "^2.0.1"
     },
     "description": "A module to accept WebRTC DataChannel connections by using WebSockets.",
