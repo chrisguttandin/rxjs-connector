@@ -17,12 +17,14 @@ export const createDataChannel = (
             webSocketSubject
         );
 
+        // tslint:disable-next-line:deprecation
         const candidateSubjectSubscription = candidateSubject.subscribe(({ candidate }) =>
             peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {
                 // Errors can be ignored.
             })
         );
 
+        // tslint:disable-next-line:deprecation
         const descriptionSubjectSubscription = descriptionSubject.subscribe(({ description }) =>
             peerConnection.setRemoteDescription(new RTCSessionDescription(description)).catch(() => {
                 // @todo Handle this error and maybe request another description.
