@@ -1,6 +1,7 @@
 import { ISubjectConfig, connect, isSupported } from 'rxjs-broker';
 import { createDataChannelAcceptingObservableFactory } from './factories/data-channel-accepting-observable-factory';
 import { createDataChannelsAcceptingObservableFactory } from './factories/data-channels-accepting-observable-factory';
+import { TWebSocketEvent } from './types';
 
 /*
  * @todo Explicitly referencing the barrel file seems to be necessary when enabling the
@@ -19,7 +20,7 @@ const createDataChannelsAcceptingObservable = createDataChannelsAcceptingObserva
     createDataChannelAcceptingObservableFactory(ICE_SERVERS)
 );
 
-export const accept = (url: string, subjectConfig: ISubjectConfig = {}) => {
+export const accept = (url: string, subjectConfig: ISubjectConfig<TWebSocketEvent> = {}) => {
     return createDataChannelsAcceptingObservable(connect(url, subjectConfig));
 };
 
