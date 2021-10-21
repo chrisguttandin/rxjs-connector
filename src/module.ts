@@ -2,7 +2,7 @@ import { ISubjectConfig, connect, isSupported } from 'rxjs-broker';
 import { createAwaitDataChannel } from './factories/await-data-channel-observable-factory';
 import { createDataChannelAcceptingObservableFactory } from './factories/data-channel-accepting-observable-factory';
 import { createDataChannelsAcceptingObservableFactory } from './factories/data-channels-accepting-observable-factory';
-import { emitChannel } from './helpers/emit-channel';
+import { emitChannel } from './functions/emit-channel';
 import { TWebSocketEvent } from './types';
 
 /*

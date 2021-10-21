@@ -1,4 +1,4 @@
-import { createDataChannel } from '../helpers/create-data-channels';
+import { createDataChannel } from '../functions/create-data-channels';
 import { TDataChannelAcceptingObservableFactoryFactory } from '../types';
 
 export const createDataChannelAcceptingObservableFactory: TDataChannelAcceptingObservableFactoryFactory = (
