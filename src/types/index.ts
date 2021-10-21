@@ -9,4 +9,5 @@ export * from './description-event';
 export * from './description-message';
 export * from './request-event';
 export * from './request-message';
+export * from './termination-event';
 export * from './web-socket-event';

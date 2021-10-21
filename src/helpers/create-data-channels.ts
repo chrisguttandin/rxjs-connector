@@ -1,6 +1,6 @@
-import { Observable } from 'rxjs';
+import { Observable, filter } from 'rxjs';
 import { IRemoteSubject, mask } from 'rxjs-broker';
-import { TCandidateEvent, TCandidateMessage, TClientEvent, TDescriptionEvent, TDescriptionMessage } from '../types';
+import { TCandidateEvent, TCandidateMessage, TClientEvent, TDescriptionEvent, TDescriptionMessage, TTerminationEvent } from '../types';
 
 export const createDataChannel = (
     iceServers: RTCIceServer[],
@@ -16,6 +16,7 @@ export const createDataChannel = (
             { type: 'description' },
             webSocketSubject
         );
+        const termination$ = webSocketSubject.pipe(filter((event): event is TTerminationEvent => event.type === 'termination'));
 
         const candidateSubjectSubscription = candidateSubject.subscribe(({ candidate }) =>
             peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {
@@ -29,9 +30,22 @@ export const createDataChannel = (
             })
         );
 
-        dataChannel.addEventListener('open', () => {
+        const terminationSubscription = termination$.subscribe(() => {
+            unsubscribe();
+
+            observer.complete();
+
+            peerConnection.close();
+        });
+
+        const unsubscribe = () => {
             candidateSubjectSubscription.unsubscribe();
             descriptionSubjectSubscription.unsubscribe();
+            terminationSubscription.unsubscribe();
+        };
+
+        dataChannel.addEventListener('open', () => {
+            unsubscribe();
 
             // Make sure to close the peerConnection when the DataChannel gets closed.
             dataChannel.addEventListener('close', () => peerConnection.close());
@@ -64,8 +78,7 @@ export const createDataChannel = (
         });
 
         return () => {
-            candidateSubjectSubscription.unsubscribe();
-            descriptionSubjectSubscription.unsubscribe();
+            unsubscribe();
 
             if (dataChannel.readyState === 'connecting') {
                 peerConnection.close();

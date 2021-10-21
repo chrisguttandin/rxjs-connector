@@ -1,7 +1,7 @@
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Subscriber, filter } from 'rxjs';
 import { IRemoteSubject, mask } from 'rxjs-broker';
 import { IDataChannelEvent } from '../interfaces';
-import { TCandidateEvent, TCandidateMessage, TClientEvent, TDescriptionEvent, TDescriptionMessage } from '../types';
+import { TCandidateEvent, TCandidateMessage, TClientEvent, TDescriptionEvent, TDescriptionMessage, TTerminationEvent } from '../types';
 
 export const awaitDataChannel = (
     iceServers: RTCIceServer[],
@@ -18,6 +18,7 @@ export const awaitDataChannel = (
             { type: 'description' },
             webSocketSubject
         );
+        const termination$ = webSocketSubject.pipe(filter((event): event is TTerminationEvent => event.type === 'termination'));
 
         const candidateChannelSubscription = candidateChannelSubject.subscribe(({ candidate }) =>
             peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {
@@ -45,9 +46,22 @@ export const awaitDataChannel = (
                 });
         });
 
-        peerConnection.addEventListener('datachannel', ({ channel }: IDataChannelEvent) => {
+        const terminationSubscription = termination$.subscribe(() => {
+            unsubscribe();
+
+            observer.complete();
+
+            peerConnection.close();
+        });
+
+        const unsubscribe = () => {
             candidateChannelSubscription.unsubscribe();
             descriptionChannelSubscription.unsubscribe();
+            terminationSubscription.unsubscribe();
+        };
+
+        peerConnection.addEventListener('datachannel', ({ channel }: IDataChannelEvent) => {
+            unsubscribe();
 
             const emitChannel = (bsrvr: Subscriber<RTCDataChannel>) => {
                 bsrvr.next(channel);
@@ -77,8 +91,7 @@ export const awaitDataChannel = (
         });
 
         return () => {
-            candidateChannelSubscription.unsubscribe();
-            descriptionChannelSubscription.unsubscribe();
+            unsubscribe();
 
             // @todo Close the PeerConnection.
         };
