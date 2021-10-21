@@ -2,10 +2,10 @@ import { Observable } from 'rxjs';
 import { IRemoteSubject } from 'rxjs-broker';
 import { createDataChannel } from '../functions/create-data-channels';
 import { TClientEvent } from '../types';
-import type { createAwaitDataChannel } from './await-data-channel-observable-factory';
+import type { createAwaitDataChannelObservableFactory } from './await-data-channel-observable-factory';
 
 export const createDataChannelAcceptingObservableFactory = (
-    createAwaitDataChannelObservable: ReturnType<typeof createAwaitDataChannel>,
+    createAwaitDataChannelObservable: ReturnType<typeof createAwaitDataChannelObservableFactory>,
     iceServers: RTCIceServer[]
 ) => {
     return (

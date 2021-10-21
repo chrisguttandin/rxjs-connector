@@ -4,7 +4,7 @@ import type { emitChannel as emitChannelFunction } from '../functions/emit-chann
 import { IDataChannelEvent } from '../interfaces';
 import { TCandidateEvent, TCandidateMessage, TClientEvent, TDescriptionEvent, TDescriptionMessage, TTerminationEvent } from '../types';
 
-export const createAwaitDataChannel = (emitChannel: typeof emitChannelFunction) => {
+export const createAwaitDataChannelObservableFactory = (emitChannel: typeof emitChannelFunction) => {
     return (iceServers: RTCIceServer[], webSocketSubject: IRemoteSubject<TClientEvent['message']>): Observable<RTCDataChannel> => {
         return new Observable((observer) => {
             const peerConnection: RTCPeerConnection = new RTCPeerConnection({ iceServers });
