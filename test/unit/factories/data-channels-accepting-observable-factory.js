@@ -1,6 +1,5 @@
 import { AnonymousSubject } from 'rxjs/internal/Subject';
 import { Observable } from 'rxjs';
-import { createDataChannelAcceptingObservableFactory } from '../../../src/factories/data-channel-accepting-observable-factory';
 import { createDataChannelsAcceptingObservableFactory } from '../../../src/factories/data-channels-accepting-observable-factory';
 import { stub } from 'sinon';
 
@@ -9,9 +8,7 @@ describe('createDataChannelsAcceptingObservable()', () => {
     let webSocketSubject;
 
     beforeEach(() => {
-        createDataChannelsAcceptingObservable = createDataChannelsAcceptingObservableFactory(
-            createDataChannelAcceptingObservableFactory([])
-        );
+        createDataChannelsAcceptingObservable = createDataChannelsAcceptingObservableFactory(() => {});
         webSocketSubject = { pipe: stub() };
 
         webSocketSubject.pipe.returns(new Observable());
