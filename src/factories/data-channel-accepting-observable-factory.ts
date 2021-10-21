@@ -1,12 +1,12 @@
 import { Observable } from 'rxjs';
 import { IRemoteSubject } from 'rxjs-broker';
-import type { createDataChannel as createDataChannelFunction } from '../functions/create-data-channels';
+import type { createDataChannelCreatingObservable as createDataChannelCreatingObservableFunction } from '../functions/create-data-channel-creating-observable';
 import { TClientEvent } from '../types';
-import type { createAwaitDataChannelObservableFactory } from './await-data-channel-observable-factory';
+import type { createDataChannelAwaitingObservableFactory } from './data-channel-awaitting-observable-factory';
 
 export const createDataChannelAcceptingObservableFactory = (
-    createAwaitDataChannelObservable: ReturnType<typeof createAwaitDataChannelObservableFactory>,
-    createDataChannel: typeof createDataChannelFunction,
+    createDataChannelAwaitingObservable: ReturnType<typeof createDataChannelAwaitingObservableFactory>,
+    createDataChannelCreatingObservable: typeof createDataChannelCreatingObservableFunction,
     iceServers: RTCIceServer[]
 ) => {
     return (
@@ -15,9 +15,9 @@ export const createDataChannelAcceptingObservableFactory = (
         webSocketSubject: IRemoteSubject<TClientEvent['message']>
     ): Observable<RTCDataChannel> => {
         if (isActive) {
-            return createDataChannel(iceServers, label, webSocketSubject);
+            return createDataChannelCreatingObservable(iceServers, label, webSocketSubject);
         }
 
-        return createAwaitDataChannelObservable(iceServers, webSocketSubject);
+        return createDataChannelAwaitingObservable(iceServers, webSocketSubject);
     };
 };

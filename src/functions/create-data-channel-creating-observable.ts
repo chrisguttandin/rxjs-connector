@@ -2,7 +2,7 @@ import { Observable, filter } from 'rxjs';
 import { IRemoteSubject, mask } from 'rxjs-broker';
 import { TCandidateEvent, TCandidateMessage, TClientEvent, TDescriptionEvent, TDescriptionMessage, TTerminationEvent } from '../types';
 
-export const createDataChannel = (
+export const createDataChannelCreatingObservable = (
     iceServers: RTCIceServer[],
     label: null | string,
     webSocketSubject: IRemoteSubject<TClientEvent['message']>
