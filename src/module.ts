@@ -2,6 +2,7 @@ import { ISubjectConfig, connect, isSupported } from 'rxjs-broker';
 import { createAwaitDataChannelObservableFactory } from './factories/await-data-channel-observable-factory';
 import { createDataChannelAcceptingObservableFactory } from './factories/data-channel-accepting-observable-factory';
 import { createDataChannelsAcceptingObservableFactory } from './factories/data-channels-accepting-observable-factory';
+import { createDataChannel } from './functions/create-data-channels';
 import { emitChannel } from './functions/emit-channel';
 import { TWebSocketEvent } from './types';
 
@@ -19,7 +20,7 @@ const ICE_SERVERS = [
 ];
 
 const createDataChannelsAcceptingObservable = createDataChannelsAcceptingObservableFactory(
-    createDataChannelAcceptingObservableFactory(createAwaitDataChannelObservableFactory(emitChannel), ICE_SERVERS)
+    createDataChannelAcceptingObservableFactory(createAwaitDataChannelObservableFactory(emitChannel), createDataChannel, ICE_SERVERS)
 );
 
 export const accept = (url: string, subjectConfig: ISubjectConfig<TWebSocketEvent> = {}) => {
