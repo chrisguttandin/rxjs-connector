@@ -1,13 +1,15 @@
-import { awaitDataChannel } from '../helpers/await-data-channels';
 import { createDataChannel } from '../helpers/create-data-channels';
 import { TDataChannelAcceptingObservableFactoryFactory } from '../types';
 
-export const createDataChannelAcceptingObservableFactory: TDataChannelAcceptingObservableFactoryFactory = (iceServers) => {
+export const createDataChannelAcceptingObservableFactory: TDataChannelAcceptingObservableFactoryFactory = (
+    createAwaitDataChannelObservable,
+    iceServers
+) => {
     return (isActive, label, webSocketSubject) => {
         if (isActive) {
             return createDataChannel(iceServers, label, webSocketSubject);
         }
 
-        return awaitDataChannel(iceServers, webSocketSubject);
+        return createAwaitDataChannelObservable(iceServers, webSocketSubject);
     };
 };

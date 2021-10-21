@@ -1,3 +1,5 @@
+export * from './await-data-channel-observable-factory';
+export * from './await-data-channel-observable-factory-factory';
 export * from './candidate-event';
 export * from './candidate-message';
 export * from './client-event';
