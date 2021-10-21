@@ -1,18 +1,11 @@
 import { Observable, filter } from 'rxjs';
-import { mask } from 'rxjs-broker';
+import { IRemoteSubject, mask } from 'rxjs-broker';
+import type { emitChannel as emitChannelFunction } from '../functions/emit-channel';
 import { IDataChannelEvent } from '../interfaces';
-import {
-    TAwaitDataChannelObservableFactoryFactory,
-    TCandidateEvent,
-    TCandidateMessage,
-    TClientEvent,
-    TDescriptionEvent,
-    TDescriptionMessage,
-    TTerminationEvent
-} from '../types';
+import { TCandidateEvent, TCandidateMessage, TClientEvent, TDescriptionEvent, TDescriptionMessage, TTerminationEvent } from '../types';
 
-export const createAwaitDataChannel: TAwaitDataChannelObservableFactoryFactory = (emitChannel) => {
-    return (iceServers, webSocketSubject) => {
+export const createAwaitDataChannel = (emitChannel: typeof emitChannelFunction) => {
+    return (iceServers: RTCIceServer[], webSocketSubject: IRemoteSubject<TClientEvent['message']>): Observable<RTCDataChannel> => {
         return new Observable((observer) => {
             const peerConnection: RTCPeerConnection = new RTCPeerConnection({ iceServers });
 
