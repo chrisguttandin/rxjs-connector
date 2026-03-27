@@ -1,5 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createDataChannelAcceptingObservableFactory } from '../../../src/factories/data-channel-accepting-observable-factory';
-import { stub } from 'sinon';
 
 describe('createDataChannelAcceptingObservable()', () => {
     let createDataChannelAwaitingObservable;
@@ -11,8 +11,8 @@ describe('createDataChannelAcceptingObservable()', () => {
     let webSocketSubject;
 
     beforeEach(() => {
-        createDataChannelAwaitingObservable = stub();
-        createDataChannelCreatingObservable = stub();
+        createDataChannelAwaitingObservable = vi.fn();
+        createDataChannelCreatingObservable = vi.fn();
         dataChannelAwaitingObservable = 'a fake observable to await data channels';
         dataChannelCreatingObservable = 'a fake observable to create data channels';
         iceServers = ['a', 'fake', 'array', 'of', 'ice', 'servers'];
@@ -24,8 +24,8 @@ describe('createDataChannelAcceptingObservable()', () => {
             iceServers
         );
 
-        createDataChannelAwaitingObservable.returns(dataChannelAwaitingObservable);
-        createDataChannelCreatingObservable.returns(dataChannelCreatingObservable);
+        createDataChannelAwaitingObservable.mockReturnValue(dataChannelAwaitingObservable);
+        createDataChannelCreatingObservable.mockReturnValue(dataChannelCreatingObservable);
     });
 
     describe('with the isActive flag set to true', () => {
@@ -40,7 +40,7 @@ describe('createDataChannelAcceptingObservable()', () => {
         it('should call createDataChannelCreatingObservable()', () => {
             createDataChannelAcceptingObservable(isActive, label, webSocketSubject);
 
-            expect(createDataChannelCreatingObservable).to.be.calledOnceWithExactly(iceServers, label, webSocketSubject);
+            expect(createDataChannelCreatingObservable).to.be.calledOnceWith(iceServers, label, webSocketSubject);
         });
 
         it('should not call createDataChannelAwaitingObservable()', () => {
@@ -62,7 +62,7 @@ describe('createDataChannelAcceptingObservable()', () => {
         it('should call createDataChannelAwaitingObservable()', () => {
             createDataChannelAcceptingObservable(isActive, null, webSocketSubject);
 
-            expect(createDataChannelAwaitingObservable).to.be.calledOnceWithExactly(iceServers, webSocketSubject);
+            expect(createDataChannelAwaitingObservable).to.be.calledOnceWith(iceServers, webSocketSubject);
         });
 
         it('should not call createDataChannelCreatingObservable()', () => {

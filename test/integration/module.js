@@ -1,4 +1,5 @@
 import { accept, isSupported } from '../../src/module';
+import { describe, expect, it } from 'vitest';
 
 describe('module', () => {
     describe('accept()', () => {
