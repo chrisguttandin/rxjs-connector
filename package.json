@@ -50,6 +50,7 @@
     "main": "build/es5/bundle.js",
     "module": "build/es2019/module.js",
     "name": "rxjs-connector",
+    "packageManager": "npm@12",
     "peerDependencies": {
         "rxjs": "^7.3.0"
     },
